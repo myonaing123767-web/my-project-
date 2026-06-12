@@ -1,187 +1,625 @@
-# Generating a JSON Web Token (JWT) for a GitHub App
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>BassTrack · Personal Finance for Bass & Core Expenses</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, 'Segoe UI', 'Inter', 'Poppins', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+    }
 
-Learn how to create a JSON Web Token (JWT) to authenticate to certain REST API endpoints with your GitHub App.
+    body {
+      background: linear-gradient(145deg, #10141c 0%, #0b0f17 100%);
+      min-height: 100vh;
+      padding: 1.5rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
 
-## About JSON Web Tokens (JWTs)
+    /* MAIN APP CARD */
+    .app-container {
+      max-width: 1300px;
+      width: 100%;
+      background: rgba(18, 25, 35, 0.65);
+      backdrop-filter: blur(2px);
+      border-radius: 3rem;
+      padding: 1.8rem;
+      box-shadow: 0 25px 45px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
+      transition: all 0.2s;
+    }
 
-In order to authenticate as an app or generate an installation access token, you must generate a JSON Web Token (JWT). If a REST API endpoint requires a JWT, the documentation for that endpoint will indicate that you must use a JWT to access the endpoint.
+    /* HEADER with bass vibe */
+    .header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 2rem;
+      border-bottom: 2px solid rgba(0, 255, 196, 0.3);
+      padding-bottom: 1rem;
+    }
 
-Your JWT must be signed using the `RS256` algorithm and must contain the following claims.
+    .title-section h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #c0ffec, #3bc9db);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      letter-spacing: -0.5px;
+    }
 
-| Claim | Meaning                               | Details                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| ----- | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `iat` | Issued At                             | The time that the JWT was created. To protect against clock drift, we recommend that you set this 60 seconds in the past and ensure that your server's date and time is set accurately (for example, by using the Network Time Protocol).                                                                                                                                                                                                                                                  |
-| `exp` | Expires At                            | The expiration time of the JWT, after which it can't be used to request an installation token. The time must be no more than 10 minutes into the future.                                                                                                                                                                                                                                                                                                                                   |
-| `iss` | Issuer                                | The client ID or application ID of your GitHub App. This value is used to find the right public key to verify the signature of the JWT. You can find your app's IDs on the settings page for your GitHub App. Use of the client ID is recommended. For more information about navigating to the settings page for your GitHub App, see [Modifying a GitHub App registration](/en/apps/maintaining-github-apps/modifying-a-github-app-registration#navigating-to-your-github-app-settings). |
-| `alg` | Message authentication code algorithm | This should be `RS256` since your JWT must be signed using the `RS256` algorithm.                                                                                                                                                                                                                                                                                                                                                                                                          |
+    .title-section p {
+      color: #8e9eae;
+      font-weight: 500;
+      font-size: 0.9rem;
+      margin-top: 0.3rem;
+    }
 
-To use a JWT, pass it in the `Authorization` header of an API request. For example:
+    .balance-glow {
+      background: #0e1a24c9;
+      backdrop-filter: blur(8px);
+      padding: 0.8rem 1.6rem;
+      border-radius: 2.5rem;
+      text-align: right;
+      border: 1px solid rgba(72, 187, 160, 0.4);
+    }
 
-```shell
-curl --request GET \
---url "https://api.github.com/app" \
---header "Accept: application/vnd.github+json" \
---header "Authorization: Bearer YOUR_JWT" \
---header "X-GitHub-Api-Version: 2026-03-10"
-```
+    .balance-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #7fad9f;
+    }
 
-In most cases, you can use `Authorization: Bearer` or `Authorization: token` to pass a token. However, if you are passing a JSON web token (JWT), you must use `Authorization: Bearer`.
+    .balance-amount {
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: #d6f3ef;
+      line-height: 1;
+    }
 
-## Generating a JSON Web Token (JWT)
+    /* stats row */
+    .stats-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.2rem;
+      margin-bottom: 2rem;
+    }
 
-Most programming languages have a package that can generate a JWT. In all cases, you must have a private key and the ID of your GitHub App. For more information about generating a private key, see [Managing private keys for GitHub Apps](/en/apps/creating-github-apps/authenticating-with-a-github-app/managing-private-keys-for-github-apps). You can find your app's ID with the `GET /app` REST API endpoint. For more information, see [Apps](/en/rest/apps/apps) in the REST API documentation.
+    .stat-card {
+      flex: 1;
+      background: #0f1722cc;
+      backdrop-filter: blur(4px);
+      border-radius: 1.8rem;
+      padding: 1rem 1.3rem;
+      border: 1px solid #2d3e4e;
+      transition: transform 0.1s ease;
+    }
 
-> \[!NOTE]
-> Instead of creating a JWT, you can use GitHub's Octokit SDKs to authenticate as an app. The SDK will take care of generating a JWT for you and will regenerate the JWT once the token expires. For more information, see [Scripting with the REST API and JavaScript](/en/rest/guides/scripting-with-the-rest-api-and-javascript#authenticating-with-a-github-app).
+    .stat-title {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #94a3b8;
+      letter-spacing: 0.5px;
+    }
 
-### Example: Using Ruby to generate a JWT
+    .stat-number {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #f0f9ff;
+    }
 
-> \[!NOTE]
-> You must run `gem install jwt` to install the `jwt` package in order to use this script.
+    .highlight-negative {
+      color: #ff9198;
+    }
 
-In the following example, replace `YOUR_PATH_TO_PEM` with the file path where your private key is stored. Replace `YOUR_CLIENT_ID` with the ID of your app. Make sure to enclose the values for `YOUR_PATH_TO_PEM` and `YOUR_CLIENT_ID` in double quotes.
+    .highlight-positive {
+      color: #6ee7b7;
+    }
 
-```ruby
-require 'openssl'
-require 'jwt'  # https://rubygems.org/gems/jwt
+    /* dual panel */
+    .finance-panels {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.8rem;
+      margin: 2rem 0 1.8rem;
+    }
 
-# Private key contents
-private_pem = File.read("YOUR_PATH_TO_PEM")
-private_key = OpenSSL::PKey::RSA.new(private_pem)
+    .panel {
+      flex: 1;
+      background: #0b111ccc;
+      border-radius: 2rem;
+      padding: 1.3rem 1.2rem;
+      border: 1px solid #2c3f4e;
+      transition: all 0.2s;
+    }
 
-# Generate the JWT
-payload = {
-  # issued at time, 60 seconds in the past to allow for clock drift
-  iat: Time.now.to_i - 60,
-  # JWT expiration time (10 minute maximum)
-  exp: Time.now.to_i + (10 * 60),
-  
-# GitHub App's client ID
-  iss: "YOUR_CLIENT_ID"
-}
+    .panel h3 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-left: 4px solid #2dd4bf;
+      padding-left: 12px;
+    }
 
-jwt = JWT.encode(payload, private_key, "RS256")
-puts jwt
-```
+    .form-group {
+      margin-bottom: 1rem;
+    }
 
-### Example: Using Python to generate a JWT
+    label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #9ab3c5;
+      margin-bottom: 4px;
+      letter-spacing: 0.5px;
+    }
 
-> \[!NOTE]
-> You must run `pip install PyJWT cryptography` to install the `PyJWT` and the `cryptography` packages in order to use this script.
+    input, select {
+      width: 100%;
+      background: #0f1a24;
+      border: 1px solid #2f4b5c;
+      border-radius: 1.2rem;
+      padding: 0.7rem 1rem;
+      color: #edf2f7;
+      font-weight: 500;
+      outline: none;
+      transition: 0.2s;
+    }
 
-```python copy
-#!/usr/bin/env python3
-import sys
-import time
+    input:focus, select:focus {
+      border-color: #3bc9db;
+      box-shadow: 0 0 0 2px rgba(59, 201, 219, 0.3);
+    }
 
-import jwt
+    button {
+      background: #1e3a3f;
+      border: none;
+      padding: 0.7rem 1.2rem;
+      border-radius: 2rem;
+      font-weight: 600;
+      color: #d1f2eb;
+      cursor: pointer;
+      transition: all 0.2s;
+      width: 100%;
+      margin-top: 0.6rem;
+      font-size: 0.85rem;
+      letter-spacing: 0.3px;
+    }
 
-# Get PEM file path
-if len(sys.argv) > 1:
-    pem = sys.argv[1]
-else:
-    pem = input("Enter path of private PEM file: ")
+    button.primary {
+      background: #0f766e;
+      color: white;
+      box-shadow: 0 4px 10px rgba(15, 118, 110, 0.3);
+    }
 
-# Get the Client ID
-if len(sys.argv) > 2:
-    client_id = sys.argv[2]
-else:
-    client_id = input("Enter your Client ID: ")
+    button.primary:hover {
+      background: #14b8a6;
+      transform: translateY(-1px);
+    }
 
-# Open PEM
-with open(pem, 'rb') as pem_file:
-    signing_key = pem_file.read()
+    button.danger {
+      background: #4a2c2c;
+      color: #ffb4a2;
+    }
 
-payload = {
-    # Issued at time
-    'iat': int(time.time()),
-    # JWT expiration time (10 minutes maximum)
-    'exp': int(time.time()) + 600,
+    button.danger:hover {
+      background: #7f3e3e;
+    }
+
+    .expense-list {
+      max-height: 260px;
+      overflow-y: auto;
+      margin-top: 1rem;
+      padding-right: 5px;
+    }
+
+    .list-item {
+      background: #07121ccc;
+      margin: 0.6rem 0;
+      padding: 0.6rem 0.9rem;
+      border-radius: 1.2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-left: 4px solid;
+      transition: 0.1s;
+    }
+
+    .item-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .item-name {
+      font-weight: 700;
+      color: #e2e8f0;
+      font-size: 0.9rem;
+    }
+
+    .item-cat {
+      font-size: 0.7rem;
+      color: #7b9eb3;
+    }
+
+    .item-amount {
+      font-weight: 800;
+      font-size: 1rem;
+    }
+
+    .delete-btn {
+      background: none;
+      border: none;
+      font-size: 1.3rem;
+      cursor: pointer;
+      color: #fb8b7c;
+      width: auto;
+      margin: 0;
+      padding: 0 8px;
+      transition: 0.1s;
+    }
+
+    .delete-btn:hover {
+      color: #ff5a4a;
+      transform: scale(1.1);
+    }
+
+    .empty-message {
+      text-align: center;
+      color: #5a7b8a;
+      padding: 1.4rem;
+      font-style: italic;
+    }
+
+    .bass-badge {
+      background: #09242e;
+      border-radius: 40px;
+      padding: 0.2rem 0.8rem;
+      font-size: 0.7rem;
+      color: #2dd4bf;
+      font-weight: bold;
+    }
+
+    footer {
+      margin-top: 2rem;
+      text-align: center;
+      font-size: 0.7rem;
+      color: #4c6a7a;
+      border-top: 1px solid #1f3340;
+      padding-top: 1rem;
+    }
+
+    @media (max-width: 780px) {
+      body {
+        padding: 0.8rem;
+      }
+      .balance-amount {
+        font-size: 1.6rem;
+      }
+      .stat-number {
+        font-size: 1.4rem;
+      }
+    }
+
+    ::-webkit-scrollbar {
+      width: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #11212e;
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2d7f72;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  <div class="header">
+    <div class="title-section">
+      <h1>🎸 BASS EXPENSE · FINANCE</h1>
+      <p>Track essential costs · low-end clarity, high-end control</p>
+    </div>
+    <div class="balance-glow">
+      <div class="balance-label">Available Groove</div>
+      <div class="balance-amount" id="totalBalanceDisplay">$0.00</div>
+    </div>
+  </div>
+
+  <!-- Stats Row: total spent, average, bass expense ratio -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-title">📀 TOTAL BASS SPENT</div>
+      <div class="stat-number" id="totalSpentDisplay">$0.00</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-title">🎛️ AVG PER ENTRY</div>
+      <div class="stat-number" id="avgExpenseDisplay">$0.00</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-title">🔊 BASS CATEGORY %</div>
+      <div class="stat-number" id="bassRatioDisplay">0%</div>
+    </div>
+  </div>
+
+  <!-- PANELS: add expense + recent list & bass tracking -->
+  <div class="finance-panels">
+    <!-- left: Add expense form -->
+    <div class="panel">
+      <h3>➕ Record bass expense</h3>
+      <div class="form-group">
+        <label>Expense name *</label>
+        <input type="text" id="expenseName" placeholder="e.g., New Bass Strings, Amp repair, Pick..." autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label>Amount ($)</label>
+        <input type="number" id="expenseAmount" step="0.01" placeholder="0.00" value="">
+      </div>
+      <div class="form-group">
+        <label>Category (bass related?)</label>
+        <select id="expenseCategory">
+          <option value="bass">🎸 Bass Gear / Instrument</option>
+          <option value="essentials">🔧 Other Essentials (cables, straps)</option>
+          <option value="general">📋 General Personal</option>
+        </select>
+      </div>
+      <button class="primary" id="addExpenseBtn">➕ Add bass expense</button>
+      <div style="margin-top: 12px;">
+        <button id="clearAllBtn" class="danger">🧹 Reset all data</button>
+      </div>
+    </div>
+
+    <!-- right: expenses list + bass insight -->
+    <div class="panel">
+      <h3>🎵 Expense log · low-end ledger</h3>
+      <div id="expensesListContainer" class="expense-list">
+        <div class="empty-message">✨ No bass expenses yet — add your first gear or essential cost.</div>
+      </div>
+      <div style="margin-top: 1rem; font-size: 0.7rem; display: flex; justify-content: space-between;">
+        <span class="bass-badge">🎸 pure bass = priority</span>
+        <span class="bass-badge">💸 every note counts</span>
+      </div>
+    </div>
+  </div>
+  <footer>
+    🎛️ Personal finance focused on bass & core expenses | Data stays in your browser (localStorage)
+  </footer>
+</div>
+
+<script>
+  // ---- DATA MODEL ----
+  // each expense: { id, name, amount, category, date }
+  let expenses = [];
+
+  // DOM Elements
+  const balanceEl = document.getElementById('totalBalanceDisplay');
+  const totalSpentEl = document.getElementById('totalSpentDisplay');
+  const avgExpenseEl = document.getElementById('avgExpenseDisplay');
+  const bassRatioEl = document.getElementById('bassRatioDisplay');
+  const expensesContainer = document.getElementById('expensesListContainer');
+  const nameInput = document.getElementById('expenseName');
+  const amountInput = document.getElementById('expenseAmount');
+  const categorySelect = document.getElementById('expenseCategory');
+  const addBtn = document.getElementById('addExpenseBtn');
+  const clearAllBtn = document.getElementById('clearAllBtn');
+
+  // Helper: load from localStorage
+  function loadFromStorage() {
+    const stored = localStorage.getItem('bass_expense_tracker');
+    if (stored) {
+      try {
+        expenses = JSON.parse(stored);
+        // ensure each item has proper structure
+        expenses = expenses.filter(exp => exp && typeof exp.amount === 'number' && exp.name);
+      } catch(e) { expenses = []; }
+    } else {
+      // default demo entries to showcase vibe: a few bass relevant samples
+      expenses = [
+        { id: Date.now() + 1, name: 'Bass Guitar Strings (Ernie Ball)', amount: 34.99, category: 'bass', date: new Date().toISOString() },
+        { id: Date.now() + 2, name: 'Fender Rumble Amp Maintenance', amount: 89.50, category: 'bass', date: new Date().toISOString() },
+        { id: Date.now() + 3, name: 'Instrument Cable', amount: 19.95, category: 'essentials', date: new Date().toISOString() },
+        { id: Date.now() + 4, name: 'Groove workshop fee', amount: 45.00, category: 'general', date: new Date().toISOString() }
+      ];
+      saveToStorage();
+    }
+  }
+
+  function saveToStorage() {
+    localStorage.setItem('bass_expense_tracker', JSON.stringify(expenses));
+  }
+
+  // Stats calculations
+  function computeStats() {
+    // total spent sum
+    const totalSpent = expenses.reduce((sum, exp) => sum + (exp.amount || 0), 0);
+    // average per expense
+    const avg = expenses.length ? (totalSpent / expenses.length) : 0;
+    // total bass category spending (bass category)
+    const bassTotal = expenses.reduce((sum, exp) => {
+      return exp.category === 'bass' ? sum + (exp.amount || 0) : sum;
+    }, 0);
+    const bassRatio = totalSpent > 0 ? (bassTotal / totalSpent) * 100 : 0;
     
-    # GitHub App's client ID
-    'iss': client_id
+    // For the balance, we consider "Available Groove" as initial theoretical budget minus total?
+    // To make it more interesting: we will show a "remaining vibe" which is a starting cap of $1000 (mock),
+    // but it's personal finance: we show balance = income - spent concept: we define flexible income base = $1500 (remix)
+    // since finance for bass expense, we can mock a monthly 'allowance' of $1500 - totalSpent
+    // provides a nice positive/negative insight.
+    const monthlyIncomeBase = 1500.00;
+    const remainingBalance = monthlyIncomeBase - totalSpent;
+    
+    // update DOM
+    balanceEl.textContent = `$${remainingBalance.toFixed(2)}`;
+    totalSpentEl.textContent = `$${totalSpent.toFixed(2)}`;
+    avgExpenseEl.textContent = `$${avg.toFixed(2)}`;
+    bassRatioEl.textContent = `${bassRatio.toFixed(1)}%`;
+    
+    // style for balance if negative 
+    if (remainingBalance < 0) {
+      balanceEl.style.color = "#ff9198";
+    } else {
+      balanceEl.style.color = "#d6f3ef";
+    }
+    
+    // extra class binding for stats ratio number
+    if (bassRatio > 50) {
+      bassRatioEl.style.color = "#6ee7b7";
+    } else {
+      bassRatioEl.style.color = "#f0f9ff";
+    }
+    
+    return { totalSpent, avg, bassRatio, remainingBalance };
+  }
 
-}
-
-# Create JWT
-encoded_jwt = jwt.encode(payload, signing_key, algorithm='RS256')
-
-print(f"JWT: {encoded_jwt}")
-```
-
-This script will prompt you for the file path where your private key is stored and for the client ID of your app. Alternatively, you can pass those values as inline arguments when you execute the script.
-
-### Example: Using Bash to generate a JWT
-
-> \[!NOTE]
-> You must pass your Client ID and the file path where your private key is stored as arguments when running this script.
-
-```bash copy
-#!/usr/bin/env bash
-
-client_id=$1 # Client ID as first argument
-
-pem=$( cat $2 ) # file path of the private key as second argument
-
-now=$(date +%s)
-iat=$((${now} - 60)) # Issues 60 seconds in the past
-exp=$((${now} + 600)) # Expires 10 minutes in the future
-
-b64enc() { openssl base64 | tr -d '=' | tr '/+' '_-' | tr -d '\n'; }
-
-header_json='{
-    "typ":"JWT",
-    "alg":"RS256"
-}'
-# Header encode
-header=$( echo -n "${header_json}" | b64enc )
-
-payload_json="{
-    \"iat\":${iat},
-    \"exp\":${exp},
-    \"iss\":\"${client_id}\"
-}"
-# Payload encode
-payload=$( echo -n "${payload_json}" | b64enc )
-
-# Signature
-header_payload="${header}"."${payload}"
-signature=$(
-    openssl dgst -sha256 -sign <(echo -n "${pem}") \
-    <(echo -n "${header_payload}") | b64enc
-)
-
-# Create JWT
-JWT="${header_payload}"."${signature}"
-printf '%s\n' "JWT: $JWT"
-```
-
-### Example: Using PowerShell to generate a JWT
-
-In the following example, replace `YOUR_PATH_TO_PEM` with the file path where your private key is stored. Replace `YOUR_CLIENT_ID` with the ID of your app. Make sure to enclose the values for `YOUR_PATH_TO_PEM` in double quotes.
-
-```powershell copy
-#!/usr/bin/env pwsh
-
-$client_id = YOUR_CLIENT_ID
-
-$private_key_path = "YOUR_PATH_TO_PEM"
-
-$header = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes((ConvertTo-Json -InputObject @{
-  alg = "RS256"
-  typ = "JWT"
-}))).TrimEnd('=').Replace('+', '-').Replace('/', '_');
-
-$payload = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes((ConvertTo-Json -InputObject @{
-  iat = [System.DateTimeOffset]::UtcNow.AddSeconds(-10).ToUnixTimeSeconds()
-  exp = [System.DateTimeOffset]::UtcNow.AddMinutes(10).ToUnixTimeSeconds()
-  iss = $client_id
-}))).TrimEnd('=').Replace('+', '-').Replace('/', '_');
-
-$rsa = [System.Security.Cryptography.RSA]::Create()
-$rsa.ImportFromPem((Get-Content $private_key_path -Raw))
-
-$signature = [Convert]::ToBase64String($rsa.SignData([System.Text.Encoding]::UTF8.GetBytes("$header.$payload"), [System.Security.Cryptography.HashAlgorithmName]::SHA256, [System.Security.Cryptography.RSASignaturePadding]::Pkcs1)).TrimEnd('=').Replace('+', '-').Replace('/', '_')
-$jwt = "$header.$payload.$signature"
-Write-Host $jwt
-```
+  // Render the list of expenses
+  function renderExpenseList() {
+    if (!expensesContainer) return;
+    if (expenses.length === 0) {
+      expensesContainer.innerHTML = `<div class="empty-message">🎸 No bass expenses yet — add your strings, amp or pedal!</div>`;
+      return;
+    }
+    
+    // sort by most recent first (id descending)
+    const sorted = [...expenses].sort((a,b) => b.id - a.id);
+    let html = '';
+    for (let exp of sorted) {
+      let categoryIcon = '';
+      let borderColor = '';
+      if (exp.category === 'bass') {
+        categoryIcon = '🎸';
+        borderColor = '#2dd4bf';
+      } else if (exp.category === 'essentials') {
+        categoryIcon = '🔌';
+        borderColor = '#eab308';
+      } else {
+        categoryIcon = '📋';
+        borderColor = '#7899b3';
+      }
+      
+      html += `
+        <div class="list-item" style="border-left-color: ${borderColor};">
+          <div class="item-info">
+            <span class="item-name">${escapeHtml(exp.name)} ${categoryIcon}</span>
+            <span class="item-cat">${exp.category === 'bass' ? 'Bass essential' : (exp.category === 'essentials' ? 'Core accessory' : 'general')}</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span class="item-amount" style="color: ${exp.category === 'bass' ? '#6ee7b7' : '#ffcf9a'}">$${exp.amount.toFixed(2)}</span>
+            <button class="delete-btn" data-id="${exp.id}">✕</button>
+          </div>
+        </div>
+      `;
+    }
+    expensesContainer.innerHTML = html;
+    
+    // attach delete events
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = parseInt(btn.getAttribute('data-id'));
+        deleteExpenseById(id);
+      });
+    });
+  }
+  
+  // simple escape to avoid XSS
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+      return c;
+    });
+  }
+  
+  function deleteExpenseById(id) {
+    expenses = expenses.filter(exp => exp.id !== id);
+    saveToStorage();
+    updateAllUI();
+  }
+  
+  function addExpense() {
+    let name = nameInput.value.trim();
+    let amountRaw = amountInput.value.trim();
+    const category = categorySelect.value;
+    
+    if (!name) {
+      alert("Please enter an expense name (e.g., 'Bass Pick', 'New Amp')");
+      return;
+    }
+    let amount = parseFloat(amountRaw);
+    if (isNaN(amount) || amount <= 0) {
+      alert("Please enter a valid positive amount (minimum $0.01)");
+      return;
+    }
+    // round to two decimals
+    amount = Math.round(amount * 100) / 100;
+    
+    const newExpense = {
+      id: Date.now(),
+      name: name,
+      amount: amount,
+      category: category,
+      date: new Date().toISOString(),
+    };
+    
+    expenses.push(newExpense);
+    saveToStorage();
+    // clear inputs
+    nameInput.value = '';
+    amountInput.value = '';
+    categorySelect.value = 'bass';   // default to bass for quick addition but keep user-friendly
+    updateAllUI();
+  }
+  
+  function clearAllData() {
+    if (confirm("⚠️ Clear ALL bass & personal expenses? This action cannot be undone.")) {
+      expenses = [];
+      saveToStorage();
+      updateAllUI();
+    }
+  }
+  
+  function updateAllUI() {
+    computeStats();         // updates balance, total spent, avg, bass %
+    renderExpenseList();    // re-render the expense log
+  }
+  
+  // Extra: enforce bass expense insight on load
+  function init() {
+    loadFromStorage();
+    updateAllUI();
+    // attach event listeners
+    addBtn.addEventListener('click', addExpense);
+    clearAllBtn.addEventListener('click', clearAllData);
+    // allow enter key on amount or name
+    const inputs = [nameInput, amountInput];
+    inputs.forEach(input => {
+      input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          addExpense();
+        }
+      });
+    });
+  }
+  
+  // start app
+  init();
+</script>
+</body>
+</html>
