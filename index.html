@@ -1,625 +1,135 @@
-<!DOCTYPE html>
-<html lang="en">
+
+        <!DOCTYPE html>
+<html lang="my">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>BassTrack · Personal Finance for Bass & Core Expenses</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: system-ui, 'Segoe UI', 'Inter', 'Poppins', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
-    }
-
-    body {
-      background: linear-gradient(145deg, #10141c 0%, #0b0f17 100%);
-      min-height: 100vh;
-      padding: 1.5rem;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    /* MAIN APP CARD */
-    .app-container {
-      max-width: 1300px;
-      width: 100%;
-      background: rgba(18, 25, 35, 0.65);
-      backdrop-filter: blur(2px);
-      border-radius: 3rem;
-      padding: 1.8rem;
-      box-shadow: 0 25px 45px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
-      transition: all 0.2s;
-    }
-
-    /* HEADER with bass vibe */
-    .header {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: baseline;
-      margin-bottom: 2rem;
-      border-bottom: 2px solid rgba(0, 255, 196, 0.3);
-      padding-bottom: 1rem;
-    }
-
-    .title-section h1 {
-      font-size: 2.2rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, #c0ffec, #3bc9db);
-      background-clip: text;
-      -webkit-background-clip: text;
-      color: transparent;
-      letter-spacing: -0.5px;
-    }
-
-    .title-section p {
-      color: #8e9eae;
-      font-weight: 500;
-      font-size: 0.9rem;
-      margin-top: 0.3rem;
-    }
-
-    .balance-glow {
-      background: #0e1a24c9;
-      backdrop-filter: blur(8px);
-      padding: 0.8rem 1.6rem;
-      border-radius: 2.5rem;
-      text-align: right;
-      border: 1px solid rgba(72, 187, 160, 0.4);
-    }
-
-    .balance-label {
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      color: #7fad9f;
-    }
-
-    .balance-amount {
-      font-size: 2.4rem;
-      font-weight: 800;
-      color: #d6f3ef;
-      line-height: 1;
-    }
-
-    /* stats row */
-    .stats-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1.2rem;
-      margin-bottom: 2rem;
-    }
-
-    .stat-card {
-      flex: 1;
-      background: #0f1722cc;
-      backdrop-filter: blur(4px);
-      border-radius: 1.8rem;
-      padding: 1rem 1.3rem;
-      border: 1px solid #2d3e4e;
-      transition: transform 0.1s ease;
-    }
-
-    .stat-title {
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: #94a3b8;
-      letter-spacing: 0.5px;
-    }
-
-    .stat-number {
-      font-size: 1.8rem;
-      font-weight: 800;
-      color: #f0f9ff;
-    }
-
-    .highlight-negative {
-      color: #ff9198;
-    }
-
-    .highlight-positive {
-      color: #6ee7b7;
-    }
-
-    /* dual panel */
-    .finance-panels {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1.8rem;
-      margin: 2rem 0 1.8rem;
-    }
-
-    .panel {
-      flex: 1;
-      background: #0b111ccc;
-      border-radius: 2rem;
-      padding: 1.3rem 1.2rem;
-      border: 1px solid #2c3f4e;
-      transition: all 0.2s;
-    }
-
-    .panel h3 {
-      font-size: 1.3rem;
-      font-weight: 600;
-      margin-bottom: 1rem;
-      color: #cbd5e1;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      border-left: 4px solid #2dd4bf;
-      padding-left: 12px;
-    }
-
-    .form-group {
-      margin-bottom: 1rem;
-    }
-
-    label {
-      display: block;
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: #9ab3c5;
-      margin-bottom: 4px;
-      letter-spacing: 0.5px;
-    }
-
-    input, select {
-      width: 100%;
-      background: #0f1a24;
-      border: 1px solid #2f4b5c;
-      border-radius: 1.2rem;
-      padding: 0.7rem 1rem;
-      color: #edf2f7;
-      font-weight: 500;
-      outline: none;
-      transition: 0.2s;
-    }
-
-    input:focus, select:focus {
-      border-color: #3bc9db;
-      box-shadow: 0 0 0 2px rgba(59, 201, 219, 0.3);
-    }
-
-    button {
-      background: #1e3a3f;
-      border: none;
-      padding: 0.7rem 1.2rem;
-      border-radius: 2rem;
-      font-weight: 600;
-      color: #d1f2eb;
-      cursor: pointer;
-      transition: all 0.2s;
-      width: 100%;
-      margin-top: 0.6rem;
-      font-size: 0.85rem;
-      letter-spacing: 0.3px;
-    }
-
-    button.primary {
-      background: #0f766e;
-      color: white;
-      box-shadow: 0 4px 10px rgba(15, 118, 110, 0.3);
-    }
-
-    button.primary:hover {
-      background: #14b8a6;
-      transform: translateY(-1px);
-    }
-
-    button.danger {
-      background: #4a2c2c;
-      color: #ffb4a2;
-    }
-
-    button.danger:hover {
-      background: #7f3e3e;
-    }
-
-    .expense-list {
-      max-height: 260px;
-      overflow-y: auto;
-      margin-top: 1rem;
-      padding-right: 5px;
-    }
-
-    .list-item {
-      background: #07121ccc;
-      margin: 0.6rem 0;
-      padding: 0.6rem 0.9rem;
-      border-radius: 1.2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-left: 4px solid;
-      transition: 0.1s;
-    }
-
-    .item-info {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .item-name {
-      font-weight: 700;
-      color: #e2e8f0;
-      font-size: 0.9rem;
-    }
-
-    .item-cat {
-      font-size: 0.7rem;
-      color: #7b9eb3;
-    }
-
-    .item-amount {
-      font-weight: 800;
-      font-size: 1rem;
-    }
-
-    .delete-btn {
-      background: none;
-      border: none;
-      font-size: 1.3rem;
-      cursor: pointer;
-      color: #fb8b7c;
-      width: auto;
-      margin: 0;
-      padding: 0 8px;
-      transition: 0.1s;
-    }
-
-    .delete-btn:hover {
-      color: #ff5a4a;
-      transform: scale(1.1);
-    }
-
-    .empty-message {
-      text-align: center;
-      color: #5a7b8a;
-      padding: 1.4rem;
-      font-style: italic;
-    }
-
-    .bass-badge {
-      background: #09242e;
-      border-radius: 40px;
-      padding: 0.2rem 0.8rem;
-      font-size: 0.7rem;
-      color: #2dd4bf;
-      font-weight: bold;
-    }
-
-    footer {
-      margin-top: 2rem;
-      text-align: center;
-      font-size: 0.7rem;
-      color: #4c6a7a;
-      border-top: 1px solid #1f3340;
-      padding-top: 1rem;
-    }
-
-    @media (max-width: 780px) {
-      body {
-        padding: 0.8rem;
-      }
-      .balance-amount {
-        font-size: 1.6rem;
-      }
-      .stat-number {
-        font-size: 1.4rem;
-      }
-    }
-
-    ::-webkit-scrollbar {
-      width: 5px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #11212e;
-      border-radius: 10px;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #2d7f72;
-      border-radius: 10px;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ဗုဒ္ဓဓမ္မ - All in One</title>
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-<div class="app-container">
-  <div class="header">
-    <div class="title-section">
-      <h1>BOSS EXPENSE TO BUY WATER AND CARWASH· FINANCE</h1>
-      <p>Track essential costs · low-end clarity, high-end control</p>
+<button class="sound-toggle" id="soundBtn" onclick="toggleSound()">🔊</button>
+
+<header class="app-header">
+  <span class="mini-icon">☸</span>
+  <h1>ဗုဒ္ဓဓမ္မ All-in-One</h1>
+</header>
+
+<!-- LOGIN -->
+<section class="screen active" id="login">
+  <div class="login-wrap">
+    <div class="login-icon">🪷</div>
+    <h2>ဗုဒ္ဓဓမ္မ App</h2>
+    <p class="sub">ဝင်ရောက်ရန် အမည်ထည့်ပါ</p>
+    <div class="input-group">
+      <label>အသုံးပြုသူအမည်</label>
+      <input type="text" id="usernameInput" placeholder="ဥပမာ - မောင်မောင်" maxlength="30">
     </div>
-    <div class="balance-glow">
-      <div class="balance-label">Available Groove</div>
-      <div class="balance-amount" id="totalBalanceDisplay">$0.00</div>
+    <button class="btn-primary" onclick="doLogin()">🔑 ဝင်ရောက်မည်</button>
+  </div>
+</section>
+
+<!-- HOME -->
+<section class="screen" id="home">
+  <div id="userInfoHome"></div>
+  <div class="intro-hero">
+    <div class="icon-big">🪷</div>
+    <h2 style="color:#8b5a2b; margin-bottom:4px;">နမော တဿ ဘဂဝတော အရဟတော သမ္မာသမ္ဗုဒ္ဓဿ</h2>
+  </div>
+  <div class="card"><h2>📺 ဓမ္မဗျူဟာ Video Folder</h2><p>Video များကို ကြည့်ရှုနိုင်ပြီး ✏️ ခလုတ်ဖြင့် rename လုပ်နိုင်ပါသည်။</p></div>
+  <div class="card"><h2>🎧 ပရိတ်ကြီး ၁၁ သုတ်</h2><p>ပါဠိ + မြန်မာဘာသာပြန် အစအဆုံး + အသံဖိုင်များ။</p></div>
+  <div class="card"><h2>🧠 အဘိဓမ္မာဂိမ်း (၅၀၀ Level)</h2><p>စိတ်၊ စေတသိက် နှင့် သင်္ဂဟ ၆ မျိုး ယှဉ်တွဲမေးခွန်းများ။</p></div>
+  <div class="card"><h2>📊 သင့် Record</h2><div id="homeRecord" style="font-size:.82rem;"></div></div>
+</section>
+
+<!-- VIDEO -->
+<section class="screen" id="pitaka">
+  <div class="card">
+    <div class="video-folder-header">
+      <h2>📺 ဓမ္မဗျူဟာ Video Folder</h2>
+      <span class="video-folder-count" id="videoCount">0 ဖိုင်</span>
+    </div>
+    <div class="video-folder-actions">
+      <button onclick="openVideoPicker()">📂 Video ဖိုင်ထည့်</button>
+      <button onclick="addDemoVideos()">➕ နမူနာထည့်</button>
+    </div>
+    <input type="file" id="videoPicker" accept="video/*" multiple style="display:none;" onchange="handleVideoFiles(event)">
+  </div>
+  <div class="video-grid" id="videoGrid">
+    <div class="empty-folder"><div class="icon">📭</div><p>Video မရှိသေးပါ</p></div>
+  </div>
+</section>
+
+<!-- GAME -->
+<section class="screen" id="game">
+  <div class="game-top">
+    <div class="level-badge" id="levelBadge">Level 0 / 500</div>
+    <div class="score-box" id="scoreBox">⭐ 0</div>
+  </div>
+  <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+  <div id="resumeBanner" style="display:none; background:#fff8e6; border-left:3px solid #d4a017; padding:8px 12px; border-radius:9px; margin-bottom:10px; font-size:.8rem; color:#6b5a3e;">
+    📌 သင်သည် Level <span id="resumeLevel">1</span> တွင် ရပ်ထားပါသည်။
+  </div>
+  <div class="question-box" id="questionBox">
+    <p>▶ ဂိမ်းစတင်ရန် ခလုတ်ကို နှိပ်ပါ<br><span style="font-size:.78rem; font-weight:normal; color:#888;">စိတ်/စေတသိက်/သင်္ဂဟ</span></p>
+  </div>
+  <div class="options" id="optionsBox"></div>
+  <div class="feedback" id="feedback"></div>
+  <div style="margin-top:14px;">
+    <button class="btn-primary" id="gameBtn" onclick="startGame()">🎮 ဂိမ်းစတင်မည်</button>
+    <button class="btn-secondary" id="resumeBtn" onclick="resumeGame()" style="display:none;">⏩ Level မှ ဆက်ဆော့မည်</button>
+  </div>
+</section>
+
+<!-- RECORDS -->
+<section class="screen" id="records">
+  <div id="userInfoRecords"></div>
+  <div class="record-summary" id="recordSummary"></div>
+  <div style="display:flex; gap:6px; margin-bottom:12px;">
+    <button class="btn-primary" onclick="printRecords()" style="flex:1; padding:11px;">🖨️ Print</button>
+    <button class="btn-secondary" onclick="clearRecords()" style="flex:1; margin:0; padding:11px; border-color:#e53935; color:#e53935;">🗑️ ရှင်းမည်</button>
+  </div>
+  <div id="recordsList"></div>
+</section>
+
+<!-- PARITTA -->
+<section class="screen" id="daily">
+  <div class="card">
+    <div class="video-folder-header">
+      <h2>🎧 ပရိတ်ကြီး ၁၁ သုတ်</h2>
+      <span class="video-folder-count" id="audioCount">0 / 11</span>
+    </div>
+    <p style="font-size:.84rem;">ပါဠိ + မြန်မာဘာသာပြန် အစအဆုံး ဖတ်ရှုနိုင်ပြီး အသံဖိုင်များ နားထောင်နိုင်ပါသည်။</p>
+    <div class="video-folder-actions">
+      <button onclick="openAudioPicker()">📂 Audio ဖိုင်ထည့်</button>
+      <button onclick="stopAllAudio()" style="background:#e53935;">⏹ အားလုံးရပ်မည်</button>
+    </div>
+    <input type="file" id="audioPicker" accept="audio/*" multiple style="display:none;" onchange="handleAudioFiles(event)">
+  </div>
+  <div id="parittaList"></div>
+</section>
+
+<nav class="bottom-nav" id="bottomNav" style="display:none;">
+  <button class="nav-btn active" data-target="home" onclick="nav(this)"><span class="icon">🏠</span>ပင်မ</button>
+  <button class="nav-btn" data-target="pitaka" onclick="nav(this)"><span class="icon">📺</span>Video</button>
+  <button class="nav-btn" data-target="game" onclick="nav(this)"><span class="icon">🧠</span>ဂိမ်း</button>
+  <button class="nav-btn" data-target="records" onclick="nav(this)"><span class="icon">📊</span>Record</button>
+  <button class="nav-btn" data-target="daily" onclick="nav(this)"><span class="icon">🎧</span>ပရိတ်</button>
+</nav>
+
+<div class="modal-overlay" id="videoModal">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeVideoModal()">✕</button>
+    <video id="modalVideo" controls playsinline></video>
+    <div class="m-title" id="modalTitle">Video</div>
+    <div class="m-actions">
+      <button onclick="renameCurrentVideo()">✏️ Rename</button>
+      <button onclick="closeVideoModal()">⏹ ပိတ်မည်</button>
     </div>
   </div>
-
-  <!-- Stats Row: total spent, average, bass expense ratio -->
-  <div class="stats-row">
-    <div class="stat-card">
-      <div class="stat-title">📀 TOTAL BASS SPENT</div>
-      <div class="stat-number" id="totalSpentDisplay">$0.00</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-title">🎛️ AVG PER ENTRY</div>
-      <div class="stat-number" id="avgExpenseDisplay">$0.00</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-title">🔊 BASS CATEGORY %</div>
-      <div class="stat-number" id="bassRatioDisplay">0%</div>
-    </div>
-  </div>
-
-  <!-- PANELS: add expense + recent list & bass tracking -->
-  <div class="finance-panels">
-    <!-- left: Add expense form -->
-    <div class="panel">
-      <h3>➕ Record bass expense</h3>
-      <div class="form-group">
-        <label>Expense name *</label>
-        <input type="text" id="expenseName" placeholder="e.g., New Bass Strings, Amp repair, Pick..." autocomplete="off">
-      </div>
-      <div class="form-group">
-        <label>Amount ($)</label>
-        <input type="number" id="expenseAmount" step="0.01" placeholder="0.00" value="">
-      </div>
-      <div class="form-group">
-        <label>Category (bass related?)</label>
-        <select id="expenseCategory">
-          <option value="bass">🎸 Bass Gear / Instrument</option>
-          <option value="essentials">🔧 Other Essentials (cables, straps)</option>
-          <option value="general">📋 General Personal</option>
-        </select>
-      </div>
-      <button class="primary" id="addExpenseBtn">➕ Add bass expense</button>
-      <div style="margin-top: 12px;">
-        <button id="clearAllBtn" class="danger">🧹 Reset all data</button>
-      </div>
-    </div>
-
-    <!-- right: expenses list + bass insight -->
-    <div class="panel">
-      <h3>🎵 Expense log · low-end ledger</h3>
-      <div id="expensesListContainer" class="expense-list">
-        <div class="empty-message">✨ No bass expenses yet — add your first gear or essential cost.</div>
-      </div>
-      <div style="margin-top: 1rem; font-size: 0.7rem; display: flex; justify-content: space-between;">
-        <span class="bass-badge">🎸 pure bass = priority</span>
-        <span class="bass-badge">💸 every note counts</span>
-      </div>
-    </div>
-  </div>
-  <footer>
-    🎛️ Personal finance focused on bass & core expenses | Data stays in your browser (localStorage)
-  </footer>
 </div>
 
-<script>
-  // ---- DATA MODEL ----
-  // each expense: { id, name, amount, category, date }
-  let expenses = [];
-
-  // DOM Elements
-  const balanceEl = document.getElementById('totalBalanceDisplay');
-  const totalSpentEl = document.getElementById('totalSpentDisplay');
-  const avgExpenseEl = document.getElementById('avgExpenseDisplay');
-  const bassRatioEl = document.getElementById('bassRatioDisplay');
-  const expensesContainer = document.getElementById('expensesListContainer');
-  const nameInput = document.getElementById('expenseName');
-  const amountInput = document.getElementById('expenseAmount');
-  const categorySelect = document.getElementById('expenseCategory');
-  const addBtn = document.getElementById('addExpenseBtn');
-  const clearAllBtn = document.getElementById('clearAllBtn');
-
-  // Helper: load from localStorage
-  function loadFromStorage() {
-    const stored = localStorage.getItem('bass_expense_tracker');
-    if (stored) {
-      try {
-        expenses = JSON.parse(stored);
-        // ensure each item has proper structure
-        expenses = expenses.filter(exp => exp && typeof exp.amount === 'number' && exp.name);
-      } catch(e) { expenses = []; }
-    } else {
-      // default demo entries to showcase vibe: a few bass relevant samples
-      expenses = [
-        { id: Date.now() + 1, name: 'Bass Guitar Strings (Ernie Ball)', amount: 34.99, category: 'bass', date: new Date().toISOString() },
-        { id: Date.now() + 2, name: 'Fender Rumble Amp Maintenance', amount: 89.50, category: 'bass', date: new Date().toISOString() },
-        { id: Date.now() + 3, name: 'Instrument Cable', amount: 19.95, category: 'essentials', date: new Date().toISOString() },
-        { id: Date.now() + 4, name: 'Groove workshop fee', amount: 45.00, category: 'general', date: new Date().toISOString() }
-      ];
-      saveToStorage();
-    }
-  }
-
-  function saveToStorage() {
-    localStorage.setItem('bass_expense_tracker', JSON.stringify(expenses));
-  }
-
-  // Stats calculations
-  function computeStats() {
-    // total spent sum
-    const totalSpent = expenses.reduce((sum, exp) => sum + (exp.amount || 0), 0);
-    // average per expense
-    const avg = expenses.length ? (totalSpent / expenses.length) : 0;
-    // total bass category spending (bass category)
-    const bassTotal = expenses.reduce((sum, exp) => {
-      return exp.category === 'bass' ? sum + (exp.amount || 0) : sum;
-    }, 0);
-    const bassRatio = totalSpent > 0 ? (bassTotal / totalSpent) * 100 : 0;
-    
-    // For the balance, we consider "Available Groove" as initial theoretical budget minus total?
-    // To make it more interesting: we will show a "remaining vibe" which is a starting cap of $1000 (mock),
-    // but it's personal finance: we show balance = income - spent concept: we define flexible income base = $1500 (remix)
-    // since finance for bass expense, we can mock a monthly 'allowance' of $1500 - totalSpent
-    // provides a nice positive/negative insight.
-    const monthlyIncomeBase = 1500.00;
-    const remainingBalance = monthlyIncomeBase - totalSpent;
-    
-    // update DOM
-    balanceEl.textContent = `$${remainingBalance.toFixed(2)}`;
-    totalSpentEl.textContent = `$${totalSpent.toFixed(2)}`;
-    avgExpenseEl.textContent = `$${avg.toFixed(2)}`;
-    bassRatioEl.textContent = `${bassRatio.toFixed(1)}%`;
-    
-    // style for balance if negative 
-    if (remainingBalance < 0) {
-      balanceEl.style.color = "#ff9198";
-    } else {
-      balanceEl.style.color = "#d6f3ef";
-    }
-    
-    // extra class binding for stats ratio number
-    if (bassRatio > 50) {
-      bassRatioEl.style.color = "#6ee7b7";
-    } else {
-      bassRatioEl.style.color = "#f0f9ff";
-    }
-    
-    return { totalSpent, avg, bassRatio, remainingBalance };
-  }
-
-  // Render the list of expenses
-  function renderExpenseList() {
-    if (!expensesContainer) return;
-    if (expenses.length === 0) {
-      expensesContainer.innerHTML = `<div class="empty-message">🎸 No bass expenses yet — add your strings, amp or pedal!</div>`;
-      return;
-    }
-    
-    // sort by most recent first (id descending)
-    const sorted = [...expenses].sort((a,b) => b.id - a.id);
-    let html = '';
-    for (let exp of sorted) {
-      let categoryIcon = '';
-      let borderColor = '';
-      if (exp.category === 'bass') {
-        categoryIcon = '🎸';
-        borderColor = '#2dd4bf';
-      } else if (exp.category === 'essentials') {
-        categoryIcon = '🔌';
-        borderColor = '#eab308';
-      } else {
-        categoryIcon = '📋';
-        borderColor = '#7899b3';
-      }
-      
-      html += `
-        <div class="list-item" style="border-left-color: ${borderColor};">
-          <div class="item-info">
-            <span class="item-name">${escapeHtml(exp.name)} ${categoryIcon}</span>
-            <span class="item-cat">${exp.category === 'bass' ? 'Bass essential' : (exp.category === 'essentials' ? 'Core accessory' : 'general')}</span>
-          </div>
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <span class="item-amount" style="color: ${exp.category === 'bass' ? '#6ee7b7' : '#ffcf9a'}">$${exp.amount.toFixed(2)}</span>
-            <button class="delete-btn" data-id="${exp.id}">✕</button>
-          </div>
-        </div>
-      `;
-    }
-    expensesContainer.innerHTML = html;
-    
-    // attach delete events
-    document.querySelectorAll('.delete-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const id = parseInt(btn.getAttribute('data-id'));
-        deleteExpenseById(id);
-      });
-    });
-  }
-  
-  // simple escape to avoid XSS
-  function escapeHtml(str) {
-    if (!str) return '';
-    return str.replace(/[&<>]/g, function(m) {
-      if (m === '&') return '&amp;';
-      if (m === '<') return '&lt;';
-      if (m === '>') return '&gt;';
-      return m;
-    }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
-      return c;
-    });
-  }
-  
-  function deleteExpenseById(id) {
-    expenses = expenses.filter(exp => exp.id !== id);
-    saveToStorage();
-    updateAllUI();
-  }
-  
-  function addExpense() {
-    let name = nameInput.value.trim();
-    let amountRaw = amountInput.value.trim();
-    const category = categorySelect.value;
-    
-    if (!name) {
-      alert("Please enter an expense name (e.g., 'Bass Pick', 'New Amp')");
-      return;
-    }
-    let amount = parseFloat(amountRaw);
-    if (isNaN(amount) || amount <= 0) {
-      alert("Please enter a valid positive amount (minimum $0.01)");
-      return;
-    }
-    // round to two decimals
-    amount = Math.round(amount * 100) / 100;
-    
-    const newExpense = {
-      id: Date.now(),
-      name: name,
-      amount: amount,
-      category: category,
-      date: new Date().toISOString(),
-    };
-    
-    expenses.push(newExpense);
-    saveToStorage();
-    // clear inputs
-    nameInput.value = '';
-    amountInput.value = '';
-    categorySelect.value = 'bass';   // default to bass for quick addition but keep user-friendly
-    updateAllUI();
-  }
-  
-  function clearAllData() {
-    if (confirm("⚠️ Clear ALL bass & personal expenses? This action cannot be undone.")) {
-      expenses = [];
-      saveToStorage();
-      updateAllUI();
-    }
-  }
-  
-  function updateAllUI() {
-    computeStats();         // updates balance, total spent, avg, bass %
-    renderExpenseList();    // re-render the expense log
-  }
-  
-  // Extra: enforce bass expense insight on load
-  function init() {
-    loadFromStorage();
-    updateAllUI();
-    // attach event listeners
-    addBtn.addEventListener('click', addExpense);
-    clearAllBtn.addEventListener('click', clearAllData);
-    // allow enter key on amount or name
-    const inputs = [nameInput, amountInput];
-    inputs.forEach(input => {
-      input.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          addExpense();
-        }
-      });
-    });
-  }
-  
-  // start app
-  init();
-</script>
+<script src="scripts.js"></script>
 </body>
 </html>
